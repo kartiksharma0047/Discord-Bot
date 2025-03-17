@@ -1,6 +1,13 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { configDotenv } from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import express from "express";
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Discord Bot is running!");
+});
 
 configDotenv(); // Load environment variables from .env
 
@@ -48,7 +55,9 @@ async function sendChunkedMessage(message, content) {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return; // Ignore bot messages
 
-  console.log(`Received message: "${message.content}" from ${message.author.username}`);
+  console.log(
+    `Received message: "${message.content}" from ${message.author.username}`
+  );
 
   const aiResponse = await getGeminiResponse(message.content);
   await sendChunkedMessage(message, aiResponse);
@@ -64,3 +73,7 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 client.login(process.env.Discord_Bot_Token);
+
+app.listen(process.env.PORT,() => {
+  console.log(`Server running on port : ${process.env.PORT}`);
+});
